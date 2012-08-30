@@ -33,6 +33,7 @@
 	/**
 	 * @author ToFishes
      * @date 2011-5-11
+     * @update 2012-8-30
      * @desc 输入内容的匹配自动提示 
      * @question: 目前在刚打开FF浏览器时，就会触发input事件，这个需要在实践中发现是否需要init规避
      * @DONE：
@@ -41,6 +42,8 @@
      * 3、唯一的resize绑定
      * @release
      * 2011-5-20 添加sequential参数配置
+     * @release 2.0
+     * 添加unselect参数，并修订一些回调传入参数
 	 */
 	$.fn.suggest = function(c){
         c = $.extend({
