@@ -51,8 +51,6 @@
 	  
         config.sequential = 1;
         config.onselect = function($currItem, $input){
-            console.info($currItem);
-            console.info($input)
             $("#selected-show").html($currItem.html());
         };
         config.textchange = function($input){
@@ -66,7 +64,7 @@
 <body>
 <div class="wrap">
     <h1><a href="http://www.cssor.com/" title="ToFishes~">Made In ToFishes~</a></h1>
-    <p>点击打包下载：  <a href="jSuggest-tofishes-1.0.zip">jQuery插件jSuggest-1.0</a></p>
+    <p>Version 2.0</p>
 
     <div class="c-panel">
         <h3 class="panel">Demo - 数据来源于淘宝搜索：</h3>
@@ -115,9 +113,11 @@
             右键查看源码，将看到本demo所编写的getCurrItemValue函数是怎样的
          </p>
          
-         <p>textchange: function($input){}, //不同于change事件在失去焦点触发，inchange依赖本插件，只要内容有变化，就会触发，并传入input对象</p>
+         <p>textchange: function($input, event){}, //不同于change事件在失去焦点触发，inchange依赖本插件，只要内容有变化，就会触发，并传入input对象</p>
          
-         <p>onselect: function($currItem){} //当选择了下拉的当前项目时执行，并传入当前项目。比如选择了某个提示项目，就提交表单。</p>
+         <p>onselect: function($currItem, $input){} //当选择了下拉的当前项目时执行，并传入当前项目。比如选择了某个提示项目，就提交表单。</p>
+
+         <p>unselect: function($input, event){} //new in 2.0, 没有选择任何提示项目，直接TAB或回车</p>
 		 
          <p>sequential: 0, //按着方向键不动是否可以持续选择，默认不可以，设置值可以是任何等价的boolean</p>
     </div>
