@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>ToFishes系列插件之输入框自动提示插件jquery-suggest</title>
+  <meta name="author" content="tofishes@163.com" />
+  <meta name="keywords" content="ToFishes,jQuery plugin" />
+  <meta name="description" content="ToFishes系列jQuery插件 - jFocus焦点图淡入淡出" />
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+
+  <script type="text/javascript" src="jquery-suggest-2.0.js"></script>
+  <link rel="stylesheet" href="http://demo.cssor.com/global.css" type="text/css" />
+  
+  <style type="text/css">
+  .text {padding:5px 3px;width:260px}
+  .suggest-list {border:1px solid #ddd;background:#fff;line-height: 20px}
+    .suggest-list li {padding:2px 5px;border-bottom:1px solid #ddd;cursor:default;zoom:1}
+    .suggest-item-even {background:#E8F2FE}
+    .suggest-curr-item {background:#6399CD; color:#fff;}
+    
+    .c-panel {padding:30px;margin:10px 0;background:#e8e8e8;border-radius:10px;-moz-border-radius:10px}
+    .c-panel p {margin:5px 0;padding:5px 10px;background:#fff;border-left:4px solid #090}
+  </style>
+  <script type="text/javascript">
+  $(function(){
+      var config = {
+          url: 'http://suggest.taobao.com/sug?code=utf-8&extras=1',
+          queryName: 'q', //url?queryName=value,默认为输入框的name属性
+          jsonp: 'callback', //设置此参数名，将开启jsonp功能，否则使用json数据结构
+          item: 'li', //下拉提示项目单位的选择器，默认一个li是一条提示，与processData写法相关
+          itemOverClass: 'suggest-curr-item', //当前下拉项目的标记类，可以作为css高亮类名
+          'z-index': 999, //提示层的层叠优先级设置，css，你懂的
+          processData: function(data){ //自定义处理返回的数据，该方法可以return一个html字符串或jquery对象，将被写入到提示的下拉层中
+              var template = [];
+              template.push('<ul class="suggest-list">');
+              var evenOdd = {'0' : 'suggest-item-even', '1': 'suggest-item-odd'}, count = 0;
+              for(var key in data.result) { //添加奇数，偶数区分
+                  template.push('<li class="' , evenOdd[(++count) % 2] , '">', data.result[key][0],'</li>');
+              };
+              template.push('</ul>');
+              return template.join('');
+          },
+          getCurrItemValue: function($currItem){ //定义如何去取得当前提示项目的值并返回值,插件根据此函数获取当前提示项目的值，并填入input中，此方法应根据processData参数来定义
+              return $currItem.text();
+          },
+          textchange: function($input){}, //不同于change事件在失去焦点触发，inchange依赖本插件，只要内容有变化，就会触发，并传入input对象
+          onselect: function($currItem){} //当选择一个下拉项目触发，并传入这个下拉项目jquery对象
+      };
+      
+      $("#auto-suggest").suggest(config);
+	  
+        config.sequential = 1;
+        config.onselect = function($currItem){
+            $("#selected-show").html($currItem.html());
+        };
+        config.textchange = function($input){
+            $("#change-show").html($input.val());
+        };
+
+      $("#auto-suggest-2").suggest(config);
+  });
+  </script>
+</head>
+<body>
+<div class="wrap">
+    <h1><a href="http://www.cssor.com/" title="ToFishes~">Made In ToFishes~</a></h1>
+    <p>点击打包下载：  <a href="jSuggest-tofishes-1.0.zip">jQuery插件jSuggest-1.0</a></p>
+
+    <div class="c-panel">
+        <h3 class="panel">Demo - 数据来源于淘宝搜索：</h3>
+        <p>$("input").suggest(config);//config是参数配置对象</p>
+        <input id="auto-suggest" name="q" class="text" />
+        
+    </div>
+
+
+    <div class="c-panel">
+        <h3 class="panel">Demo 2 - 开启sequential参数(可以持续按住up或down键)，设置onselect, textchange参数的演示：</h3>
+
+		<p>config.textchange效果： <span id="change-show" style="color:#f60">[none]</span></p>		
+		<p>config.onselect效果： <span id="selected-show" style="color:#0a0">[none]</span></p>
+        <p>
+		 config.sequential = 1;<br />
+		 config.onselect = function($currItem){
+		     $("#selected-show").html($currItem.html());
+		 };<br />
+		 config.textchange = function($input){
+		     $("#change-show").html($input.val());
+		 };
+		</p>
+        <input id="auto-suggest-2" name="q" class="text" />
+    </div>
+
+     <div class="c-panel">
+         <div>插件使用配置（config）还是很灵活的，当然也是弊端，配置不当，效果就没了。</div>
+         <div>使用时候，重要的参数如下(此demo参数配置点击右键看源码)：</div>
+         
+         <p>
+            url: 'http://suggest.taobao.com/sug?code=utf-8&amp;extras=1',
+         </p>
+         <p>queryName: 'q', //url?queryName=value,默认为输入框的name属性</p>
+         
+         <p>jsonp: 'callback', //设置此参数名，将开启jsonp跨域功能（我要调淘宝数据，非跨域不可，淘宝的回调参数名就是callback），否则使用json数据结构</p>
+         
+         <p>item: 'li', //下拉提示项目单位的选择器，默认一个li是一条提示，与processData写法相关。</p>
+         
+         <p>processData: function(data){ }//自定义处理返回的数据，该方法可以return一个html字符串或jquery对象，将被写入到提示的下拉层中。
+            右键查看源码，将看到本demo所编写的processData函数是怎样的，所以这个参数是把如何表现交给你来做了，但别忘了配合 item 参数
+         </p>
+         
+         <p>getCurrItemValue: function($currItem){ }//定义如何去取得当前提示项目的值并返回值,插件根据此函数获取当前提示项目的值，并填入input中，此方法应根据processData参数来定义。
+            是的，如果你自定义了processData，这个参数恐怕也需要自定义，默认是获取$currItem.html()，你也可以return $currItem.attr('an attrName');
+            右键查看源码，将看到本demo所编写的getCurrItemValue函数是怎样的
+         </p>
+         
+         <p>textchange: function($input){}, //不同于change事件在失去焦点触发，inchange依赖本插件，只要内容有变化，就会触发，并传入input对象</p>
+         
+         <p>onselect: function($currItem){} //当选择了下拉的当前项目时执行，并传入当前项目。比如选择了某个提示项目，就提交表单。</p>
+		 
+         <p>sequential: 0, //按着方向键不动是否可以持续选择，默认不可以，设置值可以是任何等价的boolean</p>
+    </div>
+</div>
+</body>
+</html>
