@@ -50,7 +50,9 @@
       $("#auto-suggest").suggest(config);
 	  
         config.sequential = 1;
-        config.onselect = function($currItem){
+        config.onselect = function($currItem, $input){
+            console.info($currItem);
+            console.info($input)
             $("#selected-show").html($currItem.html());
         };
         config.textchange = function($input){

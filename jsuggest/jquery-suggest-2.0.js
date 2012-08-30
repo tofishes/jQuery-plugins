@@ -69,7 +69,7 @@
         		return $currItem.text();
         	},
         	textchange: function($input, event){}, //不同于change事件在失去焦点触发，inchange依赖本插件，只要内容有变化，就会触发，并传入input对象
-        	onselect: function($input, $currItem){}, //当选择了下拉的当前项目时执行，并传入当前项目
+        	onselect: function($currItem, $input){}, //当选择了下拉的当前项目时执行，并传入当前项目
             unselect: function($input, e) {} //没有选择任何提示项目，直接TAB或回车
         }, c);
 
@@ -98,7 +98,7 @@
             		var $item = $(e.target).closest(c.item);
             		if($item.length) {
             			$t.val(c.getCurrItemValue($item));
-            			c.onselect($t, $item);
+            			c.onselect($item, $t);
                 		suggestClose();
             		};
             	},
@@ -147,20 +147,20 @@
                 };
             };
         	
-        	var selectBusy = false /* 防止一直按键时候不停触发keydown */, triggerChange = true /*for ie*/, dataExpired = false /*检查网络延时导致的ajax数据过期*/,
+        	var selectBusy = false /* 防止一直按键时候不停触发keydown */, triggerChange = true /*for ie*/,
             keyHandler = { //没有上下条的时候，要回到input内
             	'move': function(down) {
         			if(! $suggest.is(":visible"))
         				return;
-            		if($curritem.length) {
-        				$curritem.removeclass(curritem);
+            		if($currItem.length) {
+        				$currItem.removeClass(CURRITEM);
             			if(down) {
-                			$curritem = $curritem.next();
+                			$currItem = $currItem.next();
                 		} else {
-                			$curritem = $curritem.prev();
+                			$currItem = $currItem.prev();
                 		};
             		} else {
-            			$curritem = $suggest.find(c.item + (down ? ':first' : ':last'));
+            			$currItem = $suggest.find(c.item + (down ? ':first' : ':last'));
             		};
             		
         			if($currItem.length) {
@@ -174,7 +174,7 @@
             	'select': function(e) { //选择
             		if($currItem.length) {
             			$t.val(c.getCurrItemValue($currItem));
-            			c.onselect($t, $currItem);
+            			c.onselect($currItem, $t);
             		} else {
                         c.unselect($t, e);
                     };
@@ -238,24 +238,24 @@
                         $t.attr('curr-value', value); //keep input value，这里的操作导致IE不能使用propertychange事件绑定，会造成死循环，故使用textchange事件扩展插件
                         var param = {}, queryName = c.queryName ? c.queryName : $t.attr('name'); //如果未设置参数查询名字，默认使用input自身name
                         param[queryName] = value;
-                        dataExpired = false; //防止网络延时造成的数据过期，先请求的数据覆盖后请求的数据
-                        (function(){
-                            var xhr = $.getJSON(URL, param, function(data){
-                                if(dataExpired) {
-                                    xhr && xhr.abort();
-                                    return;
-                                };
-                                if(data) {
-                                    $suggest.html(c.processData(data));
-                                    fixes();
-                                    $suggest.show();
-                                    $currItem = $(); //有新数据，重置$currItem
-                                } else {
-                                    $suggest.hide();
-                                };
-                                dataExpired = true;
-                            });  
-                        })();
+
+                        var xhr = $.getJSON(URL, param, function(data){
+                            var _xhr = $t.data('cache-xhr');
+                            if(_xhr && _xhr.readyState != 4) {
+                                _xhr.abort();
+                            };
+
+                            if(data) {
+                                $suggest.html(c.processData(data));
+                                fixes();
+                                $suggest.show();
+                                $currItem = $(); //有新数据，重置$currItem
+                            } else {
+                                $suggest.hide();
+                            };
+                            dataExpired = true;
+                        });  
+                        $t.data('cache-xhr', xhr);
                     } else {
                         $suggest.hide();
                     };
