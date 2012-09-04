@@ -227,7 +227,7 @@
                 };
 
                 //—”≥Ÿ∫¡√Î
-                var changeDelayTime = 500;
+                var changeDelayTime = 300;
                 var changeDelayId = setTimeout(function(){
 
                     if(ie && ! triggerChange) {
@@ -253,7 +253,6 @@
                             } else {
                                 $suggest.hide();
                             };
-                            dataExpired = true;
                         });  
                         $t.data('cache-xhr', xhr);
                     } else {
