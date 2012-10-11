@@ -43,7 +43,10 @@
      * @release
      * 2011-5-20 添加sequential参数配置
      * @release 2.0
-     * 添加unselect参数，并修订一些回调传入参数
+     * 1、添加unselect参数，并修订一些回调传入参数
+     * 2、ajax请求做了300ms的延迟，防止太频繁触发。
+     * 3、更换了数据过期的处理方法。
+     * 4、补上了标准浏览器的 onpaste oncut事件监听
 	 */
 	$.fn.suggest = function(c){
         c = $.extend({
@@ -76,7 +79,7 @@
 		var ie = !-[1,], ie6 = ie && !window.XMLHttpRequest,
         CURRINPUT = 'suggest-curr-input', SUGGESTOVER = 'suggest-panel-overing', suggestShimId = 'suggest-shim-iframe',
         UP = 38, DOWN = 40, ESC = 27, TAB = 9, ENTER = 13,
-        CHANGE = 'input.suggest'/*@cc_on + ' textchange.suggest'@*/, RESIZE = 'resize.suggest',
+        CHANGE = 'input.suggest paste.suggest cut.suggest '/*@cc_on + ' textchange.suggest'@*/, RESIZE = 'resize.suggest',
         BLUR = 'blur.suggest', KEYDOWN = 'keydown.suggest', KEYUP = 'keyup.suggest';
        
         return this.each(function(){
