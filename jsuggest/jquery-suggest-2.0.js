@@ -50,7 +50,7 @@
 	 */
 	$.fn.suggest = function(c){
         c = $.extend({
-        	url: 'ajax-ok.html',
+        	url: '',
         	queryName: null, //url?queryName=value,默认为输入框的name属性
         	jsonp: null, //设置此参数名，将开启jsonp功能，否则使用json数据结构
         	item: 'li', //下拉提示项目单位的选择器，默认一个li是一条提示，与processData写法相关
@@ -71,7 +71,7 @@
         	getCurrItemValue: function($currItem){ //定义如何去取得当前提示项目的值并返回值,插件根据此函数获取当前提示项目的值，并填入input中，此方法应根据processData参数来定义
         		return $currItem.text();
         	},
-        	textchange: function($input, event){}, //不同于change事件在失去焦点触发，inchange依赖本插件，只要内容有变化，就会触发，并传入input对象
+        	textchange: function(value, $suggestList){}, //不同于change事件在失去焦点触发，textchange依赖本插件，只要内容有变化，就会触发，并传入输入值和下拉列表层对象, 内部this会指向input输入框
         	onselect: function($currItem, $input){}, //当选择了下拉的当前项目时执行，并传入当前项目
             unselect: function($input, e) {} //没有选择任何提示项目，直接TAB或回车
         }, c);
@@ -232,12 +232,11 @@
                 //延迟毫秒
                 var changeDelayTime = 300;
                 var changeDelayId = setTimeout(function(){
-
                     if(ie && ! triggerChange) {
                         return;
                     };
                     var value = $.trim($t.val());
-                    if(value) {
+                    if(value && c.url) {
                         $t.attr('curr-value', value); //keep input value，这里的操作导致IE不能使用propertychange事件绑定，会造成死循环，故使用textchange事件扩展插件
                         var param = {}, queryName = c.queryName ? c.queryName : $t.attr('name'); //如果未设置参数查询名字，默认使用input自身name
                         param[queryName] = value;
@@ -261,7 +260,7 @@
                     } else {
                         $suggest.hide();
                     };
-                    c.textchange($t, e); //执行配置中的textchange，顺便提供一个有用的api
+                    c.textchange.call($t, value, $suggest); //执行配置中的textchange，顺便提供一个有用的api
                 }, changeDelayTime);
 
                 $t.data('changeDelayId', changeDelayId);
