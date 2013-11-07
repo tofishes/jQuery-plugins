@@ -4,14 +4,14 @@
 	 * 在suggest插件中就不是很好用了。故使用这个特殊事件插件, 原插件位于http://www.zurb.com/playground/jquery-text-change-custom-event，
 	 * 这里已经对实现做了修改，将.data('lastValue')改为.attr('lastValue'）存储以提高性能。
 	 */
-	$.event.special.textchange = { //bind('textchange', function(event, oldvalue, newvalue){}) //传入旧值和当前新值
+	$.event.special.textchange = { //on('textchange', function(event, oldvalue, newvalue){}) //传入旧值和当前新值
 		setup: function (data, namespaces) {
 		  $(this).attr('lastValue', this.contentEditable === 'true' ? $(this).html() : $(this).val());
-			$(this).bind('keyup.textchange', $.event.special.textchange.handler);
-			$(this).bind('cut.textchange paste.textchange input.textchange', $.event.special.textchange.delayedHandler);
+			$(this).on('keyup.textchange', $.event.special.textchange.handler);
+			$(this).on('cut.textchange paste.textchange input.textchange', $.event.special.textchange.delayedHandler);
 		},
 		teardown: function (namespaces) {
-			$(this).unbind('.textchange');
+			$(this).unon('.textchange');
 		},
 		handler: function (event) {
 			$.event.special.textchange.triggerIfChanged($(this));
@@ -53,6 +53,7 @@
         	url: '',
         	queryName: null, //url?queryName=value,默认为输入框的name属性
         	jsonp: null, //设置此参数名，将开启jsonp功能，否则使用json数据结构
+            itemContainer: null, // 下拉提示层容器,如果不指定，则自动生成
         	item: 'li', //下拉提示项目单位的选择器，默认一个li是一条提示，与processData写法相关
         	itemOverClass: 'suggest-curr-item', //当前下拉项目的标记类，可以作为css高亮类名
         	sequential: 0, //按着方向键不动是否可以持续选择，默认不可以，设置值可以是任何等价的boolean。
@@ -88,9 +89,11 @@
             var URL = c.jsonp ? [c.url, hyphen, c.jsonp, '=?'].join('') : c.url, //开启jsonp，则修订url，不可以用param传递，？会被编码为%3F
             CURRITEM = c.itemOverClass,  $currItem = $(), sequentialTimeId = null;
         	 
-        	var $suggest = $(["<div style='position:absolute;zoom:1;z-index:", c['z-index'], "' class='auto-suggest-wrap'></div>"].join('')).appendTo('body');
+            var $suggest = c.itemContainer;
+            if (! $suggest)
+                $suggest = $(["<div style='position:absolute;zoom:1;z-index:", c['z-index'], "' class='auto-suggest-wrap'></div>"].join('')).appendTo('body');
         	
-            $suggest.bind({
+            $suggest.on({
             	'mouseenter.suggest': function(e){
             		$(this).addClass(SUGGESTOVER);
             	},
@@ -266,7 +269,7 @@
                 $t.data('changeDelayId', changeDelayId);
 			};
 			
-    		$t.bind(inputEvents);
+    		$t.on(inputEvents);
         });
     };
 })(jQuery);
